@@ -1,4 +1,4 @@
-import github from '@actions/github'
+import {Octokit} from '@octokit/rest'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import {OctokitResponse} from '@octokit/types/dist-types'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -154,7 +154,7 @@ export function getOldestVersions(
   startCursor: string,
   token: string
 ): Observable<QueryInfo> {
-  const octokit = github.getOctokit(token)
+  const octokit = new Octokit({auth: token})
 
   // TODO: See if package type can be inferred instead of required as parameter.
   const package_type = 'npm'
