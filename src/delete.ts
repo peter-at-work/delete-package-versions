@@ -88,6 +88,11 @@ export function finalIds(input: Input): Observable<string[]> {
       ).pipe(
         // This code block executes on batches of 100 versions starting from oldest
         map(value => {
+          console.log('Query results before filter:')
+          for (const info of value) {
+            console.log(`  ${info.id} ${info.version}`)
+          }
+
           /* 
           Here totalCount is the total no of versions in the package.
           First we update totalCount by removing no of ignored versions from it and also filter them out from value.

@@ -1,5 +1,6 @@
 import {from, Observable, merge, throwError, of} from 'rxjs'
 import {catchError, map, tap} from 'rxjs/operators'
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import {graphql} from './graphql'
 
 let deleted = 0
@@ -10,6 +11,7 @@ export interface DeletePackageVersionMutationResponse {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const mutation = `
   mutation deletePackageVersion($packageVersionId: ID!) {
       deletePackageVersion(input: {packageVersionId: $packageVersionId}) {
@@ -19,16 +21,25 @@ const mutation = `
 
 export function deletePackageVersion(
   packageVersionId: string,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   token: string
 ): Observable<boolean> {
   deleted += 1
+  console.log('Deleting version:', packageVersionId)
   return from(
+    /*
     graphql(token, mutation, {
       packageVersionId,
       headers: {
         Accept: 'application/vnd.github.package-deletes-preview+json'
       }
     }) as Promise<DeletePackageVersionMutationResponse>
+    */
+    Promise.resolve({
+      deletePackageVersion: {
+        success: true
+      }
+    })
   ).pipe(
     catchError(err => {
       const msg = 'delete version mutation failed.'
