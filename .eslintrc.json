@@ -69,7 +69,8 @@
       "no-console": "off",
       "import/no-unresolved": "off",
       "sort-imports": "off",
-      "filenames/match-regex": "off"
+      "filenames/match-regex": "off",
+      "i18n-text/no-en": "off"
     },
     "env": {
       "node": true,

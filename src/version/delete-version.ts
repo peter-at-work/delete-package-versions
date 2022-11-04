@@ -1,4 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import {from, Observable, merge, throwError, of} from 'rxjs'
 import {catchError, map, tap} from 'rxjs/operators'
 import {graphql} from './graphql'
