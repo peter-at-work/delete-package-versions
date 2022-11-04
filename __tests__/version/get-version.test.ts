@@ -25,7 +25,7 @@ describe.skip('get versions tests -- call graphql', () => {
   })
 })
 
-describe('get versions tests -- mock graphql', () => {
+describe.skip('get versions tests -- mock graphql', () => {
   it('getOldestVersions -- success', done => {
     const numVersions = 5
     mockOldestQueryResponse(numVersions)

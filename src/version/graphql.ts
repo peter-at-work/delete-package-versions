@@ -1,4 +1,4 @@
-import {GitHub} from '@actions/github'
+import github from '@actions/github'
 import {GraphQlQueryResponseData} from '@octokit/graphql/dist-types/types'
 import {RequestParameters} from '@octokit/types/dist-types/RequestParameters'
 
@@ -14,6 +14,6 @@ export async function graphql(
   query: string,
   parameters: RequestParameters
 ): Promise<GraphQlQueryResponseData> {
-  const github = new GitHub(token)
-  return await github.graphql(query, parameters)
+  const octokit = github.getOctokit(token)
+  return await octokit.graphql(query, parameters)
 }

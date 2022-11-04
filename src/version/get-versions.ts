@@ -1,3 +1,8 @@
+import github from '@actions/github'
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import {OctokitResponse} from '@octokit/types/dist-types'
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import {RestEndpointMethodTypes} from '@octokit/plugin-rest-endpoint-methods/dist-types'
 import {GraphQlQueryResponse} from '@octokit/graphql/dist-types/types'
 import {Observable, from, throwError} from 'rxjs'
 import {catchError, map} from 'rxjs/operators'
@@ -149,6 +154,45 @@ export function getOldestVersions(
   startCursor: string,
   token: string
 ): Observable<QueryInfo> {
+  const octokit = github.getOctokit(token)
+
+  // TODO: See if package type can be inferred instead of required as parameter.
+  const package_type = 'npm'
+  //const iterator = octokit.paginate.iterator(
+  //  octokit.rest.packages.getAllPackageVersionsForPackageOwnedByOrg,
+  //  {
+  //    org: owner,
+  //    repo,
+  //    per_page: 100,
+  //    package_type,
+  //    package_name: packageName
+  //  }
+  //)
+  const paginator = octokit.paginate(
+    octokit.rest.packages.getAllPackageVersionsForPackageOwnedByOrg,
+    {
+      org: owner,
+      repo,
+      per_page: 100,
+      package_type,
+      package_name: packageName
+    }
+  ) as Promise<{id: number; name: string}[]>
+
+  return from(paginator).pipe(
+    map(versions => {
+      const r: QueryInfo = {
+        versions: versions
+          .map(value => ({id: value.id.toString(), version: value.name}))
+          .reverse(),
+        cursor: '',
+        paginate: false,
+        totalCount: versions.length
+      }
+      return r
+    })
+  )
+
   return queryForOldestVersions(
     owner,
     repo,
