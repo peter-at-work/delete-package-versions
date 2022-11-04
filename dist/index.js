@@ -346,10 +346,19 @@ function getOldestVersions(owner, repo, packageName, numVersions, startCursor, t
     //    package_name: packageName
     //  }
     //)
-    const paginator = octokit.paginate(octokit.rest.packages.getAllPackageVersionsForPackageOwnedByOrg, {
-        org: owner,
-        repo,
+    console.log('token:', !!token);
+    console.log('owner:', owner);
+    console.log('repo:', repo);
+    const paginator = octokit.paginate(octokit.rest.packages.getAllPackageVersionsForAPackageOwnedByAnOrg, 
+    //{
+    //  org: owner,
+    //  repo: repo,
+    //  package_type: package_type,
+    //  package_name: packageName
+    //}
+    {
         per_page: 100,
+        org: owner,
         package_type,
         package_name: packageName
     });
