@@ -156,8 +156,8 @@ export function getOldestVersions(
 ): Observable<QueryInfo> {
   const octokit = new Octokit({auth: token})
 
-  // TODO: See if package type can be inferred instead of required as parameter.
-  const package_type = 'npm'
+  // TODO: See if package type can be inferred (using GraphQL?) instead of required as parameter.
+  const packageType = 'npm'
   //const iterator = octokit.paginate.iterator(
   //  octokit.rest.packages.getAllPackageVersionsForPackageOwnedByOrg,
   //  {
@@ -169,16 +169,16 @@ export function getOldestVersions(
   //  }
   //)
 
-  console.log('owner:', owner)
-  console.log('repo:', repo)
-  console.log('packageName:', packageName)
-
+  // NPM packages are owned by the organization, optionally connected to a repository;
+  // The access token will have to be organization-scoped; the standard GITHUB_TOKEN will not have access to the NPM packages.
+  // The repo query parameter is not used in the Packages REST API.
+  // TODO: This only applies to package types container and npm.
   const paginator = octokit.paginate(
     octokit.rest.packages.getAllPackageVersionsForPackageOwnedByOrg,
     {
       org: owner,
       per_page: 100,
-      package_type,
+      package_type: packageType,
       package_name: packageName
     }
   ) as Promise<{id: number; name: string}[]>

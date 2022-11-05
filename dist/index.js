@@ -108,7 +108,7 @@ function deleteVersions(input) {
         return rxjs_1.of(true);
     }
     const result = finalIds(input);
-    return result.pipe(operators_1.concatMap(ids => version_1.deletePackageVersions(ids, input.token)));
+    return result.pipe(operators_1.concatMap(ids => version_1.deletePackageVersions(ids, input)));
 }
 exports.deleteVersions = deleteVersions;
 
@@ -182,6 +182,7 @@ exports.Input = Input;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.deletePackageVersions = exports.deletePackageVersion = void 0;
+const rest_1 = __nccwpck_require__(5375);
 const rxjs_1 = __nccwpck_require__(5805);
 const operators_1 = __nccwpck_require__(7801);
 let deleted = 0;
@@ -192,11 +193,13 @@ const mutation = (/* unused pure expression or super */ null && (`
           success
       }
   }`));
-function deletePackageVersion(packageVersionId, 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-token) {
+function deletePackageVersion(packageVersionId, input) {
     deleted += 1;
     console.log('Deleting version:', packageVersionId);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const octokit = new rest_1.Octokit({ auth: input.token });
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const packageType = 'npm';
     return rxjs_1.from(
     /*
     graphql(token, mutation, {
@@ -205,6 +208,14 @@ token) {
         Accept: 'application/vnd.github.package-deletes-preview+json'
       }
     }) as Promise<DeletePackageVersionMutationResponse>
+    */
+    /*
+    octokit.rest.packages.deletePackageVersionForOrg({
+      org: input.owner,
+      package_type: packageType,
+      package_name: input.packageName,
+      package_version_id: Number.parseInt(packageVersionId)
+    })
     */
     Promise.resolve({
         deletePackageVersion: {
@@ -218,11 +229,11 @@ token) {
     }), operators_1.map(response => response.deletePackageVersion.success));
 }
 exports.deletePackageVersion = deletePackageVersion;
-function deletePackageVersions(packageVersionIds, token) {
+function deletePackageVersions(packageVersionIds, input) {
     if (packageVersionIds.length === 0) {
         return rxjs_1.of(true);
     }
-    const deletes = packageVersionIds.map(id => deletePackageVersion(id, token).pipe(operators_1.tap(result => {
+    const deletes = packageVersionIds.map(id => deletePackageVersion(id, input).pipe(operators_1.tap(result => {
         if (!result) {
             console.log(`version with id: ${id}, not deleted`);
         }
@@ -334,8 +345,8 @@ function queryForOldestVersions(owner, repo, packageName, numVersions, startCurs
 exports.queryForOldestVersions = queryForOldestVersions;
 function getOldestVersions(owner, repo, packageName, numVersions, startCursor, token) {
     const octokit = new rest_1.Octokit({ auth: token });
-    // TODO: See if package type can be inferred instead of required as parameter.
-    const package_type = 'npm';
+    // TODO: See if package type can be inferred (using GraphQL?) instead of required as parameter.
+    const packageType = 'npm';
     //const iterator = octokit.paginate.iterator(
     //  octokit.rest.packages.getAllPackageVersionsForPackageOwnedByOrg,
     //  {
@@ -346,13 +357,14 @@ function getOldestVersions(owner, repo, packageName, numVersions, startCursor, t
     //    package_name: packageName
     //  }
     //)
-    console.log('owner:', owner);
-    console.log('repo:', repo);
-    console.log('packageName:', packageName);
+    // NPM packages are owned by the organization, optionally connected to a repository;
+    // The access token will have to be organization-scoped; the standard GITHUB_TOKEN will not have access to the NPM packages.
+    // The repo query parameter is not used in the Packages REST API.
+    // TODO: This only applies to package types container and npm.
     const paginator = octokit.paginate(octokit.rest.packages.getAllPackageVersionsForPackageOwnedByOrg, {
         org: owner,
         per_page: 100,
-        package_type,
+        package_type: packageType,
         package_name: packageName
     });
     return rxjs_1.from(paginator).pipe(operators_1.map(versions => {
