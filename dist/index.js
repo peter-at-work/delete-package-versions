@@ -210,6 +210,7 @@ function deletePackageVersion(packageVersionId, input) {
     }) as Promise<DeletePackageVersionMutationResponse>
     */
     /*
+    // TODO: Access token should have the `packages:delete` scope.
     octokit.rest.packages.deletePackageVersionForOrg({
       org: input.owner,
       package_type: packageType,
