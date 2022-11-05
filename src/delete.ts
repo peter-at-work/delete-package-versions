@@ -103,13 +103,7 @@ export function finalIds(input: Input): Observable<string[]> {
           */
           totalCount =
             totalCount -
-            value.filter(info => {
-              const result = input.ignoreVersions.test(info.version)
-              console.log('  input.ignoreVersions:', input.ignoreVersions)
-              console.log('  version:', info.version)
-              console.log('  regex test:', result)
-              return result
-            }).length
+            value.filter(info => input.ignoreVersions.test(info.version)).length
           value = value.filter(info => !input.ignoreVersions.test(info.version))
           let toDelete = totalCount - input.minVersionsToKeep - input.numDeleted
           toDelete = toDelete > value.length ? value.length : toDelete
