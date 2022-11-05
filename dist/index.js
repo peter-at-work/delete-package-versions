@@ -345,22 +345,21 @@ function queryForOldestVersions(owner, repo, packageName, numVersions, startCurs
 exports.queryForOldestVersions = queryForOldestVersions;
 function getOldestVersions(owner, repo, packageName, numVersions, startCursor, token) {
     const octokit = new rest_1.Octokit({ auth: token });
-    // TODO: See if package type can be inferred (using GraphQL?) instead of required as parameter.
+    // TODO: Packages REST API requires package_type query parameter, and cannot be inferred.
     const packageType = 'npm';
-    //const iterator = octokit.paginate.iterator(
-    //  octokit.rest.packages.getAllPackageVersionsForPackageOwnedByOrg,
-    //  {
-    //    org: owner,
-    //    repo,
-    //    per_page: 100,
-    //    package_type,
-    //    package_name: packageName
-    //  }
-    //)
     // NPM packages are owned by the organization, optionally connected to a repository;
     // The access token will have to be organization-scoped; the standard GITHUB_TOKEN will not have access to the NPM packages.
     // The repo query parameter is not used in the Packages REST API.
     // TODO: This only applies to package types container and npm.
+    //const iterator = octokit.paginate.iterator(
+    //  octokit.rest.packages.getAllPackageVersionsForPackageOwnedByOrg,
+    //  {
+    //    org: owner,
+    //    per_page: 100,
+    //    package_type: packageType,
+    //    package_name: packageName
+    //  }
+    //)
     const paginator = octokit.paginate(octokit.rest.packages.getAllPackageVersionsForPackageOwnedByOrg, {
         org: owner,
         per_page: 100,
